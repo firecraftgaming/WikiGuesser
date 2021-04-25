@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Component } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Back from '../components/Back';
+import { FormObject, FormSwitch } from '../components/Form';
 import { Hamburger, HamburgerButton, HamburgerMenuButton } from '../components/Hamburger';
 import Colors from '../constants/Colors';
 
@@ -34,6 +35,8 @@ export default class CreateScreen extends Component<ScreenProps, {}> {
       <View style={styles.container}>
           <Back onClick={() => this.navigation.pop()}/>
           <HamburgerButton open={this.hamburger?.state?.open} onClick={() => this.hamburger?.open()}/>
+
+          <FormObject title="Test"><FormSwitch></FormSwitch></FormObject>
       </View>
     );
     return (
