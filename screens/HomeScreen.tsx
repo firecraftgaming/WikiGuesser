@@ -34,7 +34,14 @@ export default class HomeScreen extends Component<ScreenProps, {open: boolean}> 
     let view = (
       <View 
         style={styles.container} >
-          
+
+          <Image source={{uri: './asset/images/HomeScreen.png'}} style={{
+            width: 400, 
+            height: 125,
+            resizeMode: 'contain',
+            
+            }} />
+
           <TouchableOpacity
             style={styles.button}
             onPress={_ => this.navigation.push('Join')}
