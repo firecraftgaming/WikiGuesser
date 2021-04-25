@@ -2,18 +2,17 @@ import { StackScreenProps } from '@react-navigation/stack';
 import * as React from 'react';
 import { Button, StyleSheet, Image, TouchableOpacity, View, Text, Alert } from 'react-native';
 import Colors from '../constants/Colors';
-import Drawer from 'react-native-drawer';
 
-import { RootStackParamList } from '../types';
+import { ScreenProps } from '../types';
 import { Component } from 'react';
-import { Hamburger } from '../components/Hamburger';
+import { Hamburger, HamburgerButton, HamburgerMenuButton } from '../components/Hamburger';
 
-export default class HomeScreen extends Component<StackScreenProps<RootStackParamList, 'Home'>, {open: boolean}> {
+export default class HomeScreen extends Component<ScreenProps, {open: boolean}> {
 
   private hamburger: Hamburger | null = null;
   private navigation: any;
   
-  constructor(props: StackScreenProps<RootStackParamList, 'Home'>) {
+  constructor(props: ScreenProps) {
     super(props);
     this.navigation = props.navigation;
     this.state = {open: false};
@@ -21,26 +20,19 @@ export default class HomeScreen extends Component<StackScreenProps<RootStackPara
 
   onOpen() {
     this.setState({
-        open: true
+      open: true
     });
   }
 
   onClose() {
-      this.setState({
-          open: false
-      });
+    this.setState({
+      open: false
+    });
   }
 
   render() {
-    return (
-      <Hamburger 
-      ref={(ref) => {
-        this.hamburger = ref;
-      }}
-      onClose={this.onClose.bind(this)}
-      onOpen={this.onOpen.bind(this)}
-      view={
-        <View 
+    let view = (
+      <View 
         style={styles.container} >
           
           <TouchableOpacity
@@ -57,16 +49,21 @@ export default class HomeScreen extends Component<StackScreenProps<RootStackPara
           >
             <Text style={styles.text}>Create</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-                    onPress={_ => this.hamburger?.open()}
-                    style={styles.logoParent}
-                >
-                    <Image
-                    style={{...styles.logo, display: this.hamburger?.state.open ? 'none' : 'flex'}}
-                    source={require('../Hamburger.png')}/>
-                </TouchableOpacity>
+
+          <HamburgerButton open={this.hamburger?.state?.open} onClick={() => this.hamburger?.open()}/>      
         </View>
-      }></Hamburger>
+    );
+    return (
+      <Hamburger
+      ref={ref => this.hamburger = ref}
+      onClose={this.onClose.bind(this)}
+      onOpen={this.onOpen.bind(this)}
+      view={view}>
+        <HamburgerMenuButton onClick={() => this.navigation.push('Settings')} title="Settings" />
+        <HamburgerMenuButton onClick={() => this.navigation.push('Theme')} title="Theme" />
+        <HamburgerMenuButton onClick={() => this.navigation.push('Language')} title="Language" />
+        <HamburgerMenuButton onClick={() => this.navigation.push('Change')} title="Change Log" />
+      </Hamburger>
     );
   }
 }
@@ -104,10 +101,6 @@ const styles = StyleSheet.create({
   },
   sideBarParent: {
     alignItems: 'center'
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
   },
   logo: {
     position: 'absolute',

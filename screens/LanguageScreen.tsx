@@ -1,11 +1,12 @@
+import { StackScreenProps } from '@react-navigation/stack';
 import * as React from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, Image } from 'react-native';
+import { StyleSheet, Button, View, Text, TouchableOpacity, Image } from 'react-native';
 import Back from '../components/Back';
 import Colors from '../constants/Colors';
 
 import { ScreenProps } from '../types';
 
-export default function CHANGE_THIS_Screen({
+export default function LanguageScreen({
   navigation,
 }: ScreenProps) {
   return (

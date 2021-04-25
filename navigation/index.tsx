@@ -8,12 +8,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import * as React from 'react';
 import { ColorSchemeName } from 'react-native';
 
-import NotFoundScreen from '../screens/NotFoundScreen';
-import HomeScreen from '../screens/HomeScreen';
-import CreateScreen from '../screens/CreateScreen';
-import JoinScreen from '../screens/JoinScreen';
-import SettingsScreen from '../screens/SettingsScreen';
-import { RootStackParamList } from '../types';
+import screens from '../screens/screens';
 
 export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }) {
   return (
@@ -24,16 +19,16 @@ export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeNa
   );
 }
 
-const Stack = createStackNavigator<RootStackParamList>();
+const Stack = createStackNavigator();
 
 function RootNavigator() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Home" component={HomeScreen} />
-      <Stack.Screen name="Create" component={CreateScreen} />
-      <Stack.Screen name="Join" component={JoinScreen} />
-      <Stack.Screen name="Settings" component={SettingsScreen} />
-      <Stack.Screen name="NotFound" component={NotFoundScreen} />
+      {
+        [...screens.keys()].map(v => (
+          <Stack.Screen name={v} component={screens.get(v)} />
+        ))
+      }
     </Stack.Navigator>
   );
 }

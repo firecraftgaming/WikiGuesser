@@ -1,18 +1,16 @@
 import React, { Component } from "react";
-import { StyleSheet, TouchableOpacity, View, Image, Text, Alert} from "react-native";
 import Drawer from "react-native-drawer";
-import { Colors } from "react-native/Libraries/NewAppScreen";
+import { StyleSheet, TouchableOpacity, View, Image, Text } from "react-native";
 
-type Props = {
-    view: any,
-    onOpen: any,
-    onClose: any,
+type HamburgerProps = {
+    view: any;
+    onOpen: Function;
+    onClose: Function;
 }
-
-class Hamburger extends Component<Props, {open: boolean}> {
+class Hamburger extends Component<HamburgerProps, {open: boolean}> {
     private drawer: Drawer | null = null;
 
-    constructor(props: Props) {
+    constructor(props: HamburgerProps) {
         super(props);
         this.setState({
             open: false
@@ -49,7 +47,7 @@ class Hamburger extends Component<Props, {open: boolean}> {
                 this.drawer = ref;
             }}
             onClose={this.onClose.bind(this)}
-            onOpen={this.onOpen.bind(this)}
+            onOpenStart={this.onOpen.bind(this)}
             content={
                 <View style={styles.sideBarParent}>
                     <TouchableOpacity
@@ -59,7 +57,9 @@ class Hamburger extends Component<Props, {open: boolean}> {
                             style={styles.close}
                             source={require('../HamburgerClose.png')} />
                     </TouchableOpacity>
-                    {this.props.children}
+                    <View style={styles.sidebarButtons}>
+                      {this.props.children}
+                    </View>
                 </View>
             }
             tapToClose={true}
@@ -70,33 +70,62 @@ class Hamburger extends Component<Props, {open: boolean}> {
             tweenEasing={'easeInQuad'}
             acceptPan={false}
         >
-                {(this.props as any).view}
+                {this.props.view}
         </Drawer>
         );
     }
 }
 
-/*
-<TouchableOpacity
-        style={styles.sidebarbutton}
-        onPress={_ => this.navigation.push('Settings')}
-        
-    >
-        <Text style={styles.text}>Join</Text>
-    </TouchableOpacity>
-*/
+type HamburgerMenuButtonProps = {
+  onClick: Function;
+  title: string;
+}
+class HamburgerMenuButton extends Component<HamburgerMenuButtonProps, {}> {
+  constructor(props: HamburgerMenuButtonProps) {
+    super(props);
+  }
+  render() {
+    return (
+      <TouchableOpacity
+        style={styles.sidebarButton}
+        onPress={_ => this.props.onClick()} >
+        <Text style={styles.sidebarText}>{this.props.title}</Text>
+      </TouchableOpacity>
+    );
+  }
+}
+
+type HamburgerButtonProps = {
+  open: boolean | undefined;
+  onClick: Function;
+}
+class HamburgerButton extends Component<HamburgerButtonProps, {}> {
+  constructor(props: HamburgerButtonProps) {
+    super(props);
+  }
+
+  render() {
+    if (this.props.open) return;
+    return (
+      <TouchableOpacity
+        onPress={_ => this.props.onClick()}
+        style={styles.logoParent} >
+          <Image
+            style={styles.logo}
+            source={require('../Hamburger.png')} />
+      </TouchableOpacity>
+    );
+  }
+}
 
 const DrawerStyles = {
     drawer: {
       backgroundColor: 'rgba(0, 0, 0, 0.4)',
       borderRightWidth: 2,
       borderColor: 'rgba(34, 34, 34, 1)',
-      shadowColor: '#000',
-      shadowOpacity: 0.58,
-      shadowOffset: {
-        width: 5,
-        height: 0
-      }
+      shadowOffset:{ width: 10, height: 10, },
+      shadowColor: 'black',
+      shadowOpacity: 1.0,
     },
     main: {
 
@@ -104,18 +133,8 @@ const DrawerStyles = {
   };
 
 const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: Colors.dark.background
-    },
     sideBarParent: {
       alignItems: 'center'
-    },
-    title: {
-      fontSize: 20,
-      fontWeight: 'bold',
     },
     logo: {
       position: 'absolute',
@@ -141,27 +160,9 @@ const styles = StyleSheet.create({
       width: 60,
       height: 60
     },
-    text: {
-      fontFamily: 'Robban',
-      fontSize: 40,
-  
-      width: 250,
-      height: 40,
-      textAlignVertical: 'center',
-      textAlign: 'center',
-    },
-    button: {
+    sidebarButton: {
       backgroundColor: '#DDDDDD',
-      width: 250,
-      height: 55,
-      margin: 12.5,
-      borderRadius: 10,
-      borderWidth: 0,
-      justifyContent: 'center'
-    },
-    sidebarbutton: {
-      backgroundColor: '#DDDDDD',
-      width: 175,
+      width: 180,
       height: 55,
       marginTop: 25,
       padding: 0,
@@ -170,6 +171,16 @@ const styles = StyleSheet.create({
       alignItems: 'center', 
       justifyContent: 'center'
     },
+    sidebarText: {
+      fontFamily: 'Robban',
+      fontSize: 30,
+      textAlignVertical: 'center',
+      textAlign: 'center',
+    },
+    sidebarButtons: {
+      position: 'absolute',
+      top: 100,
+    }
 });
 
-export { Hamburger };
+export { Hamburger, HamburgerMenuButton, HamburgerButton };

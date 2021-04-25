@@ -1,24 +1,54 @@
-import { StackScreenProps } from '@react-navigation/stack';
 import * as React from 'react';
-import { StyleSheet, View, Image, TouchableOpacity } from 'react-native';
+import { Component } from 'react';
+import { StyleSheet, View } from 'react-native';
+import Back from '../components/Back';
+import { Hamburger, HamburgerButton, HamburgerMenuButton } from '../components/Hamburger';
 import Colors from '../constants/Colors';
 
-import { RootStackParamList } from '../types';
+import { ScreenProps } from '../types';
 
-export default function CreateScreen({
-  navigation,
-}: StackScreenProps<RootStackParamList, 'Create'>) {
-  return (
-    <View style={styles.container}>
-        <TouchableOpacity
-            style={styles.back}
-            onPress={_ => navigation.pop()}
-            >
-            <Image
-                source={require('../Back.png')} />
-        </TouchableOpacity>
-    </View>
-  );
+export default class CreateScreen extends Component<ScreenProps, {}> {
+  private hamburger: Hamburger | null = null;
+  private navigation: any;
+  
+  constructor(props: ScreenProps) {
+    super(props);
+    this.navigation = props.navigation;
+    this.state = {open: false};
+  }
+
+  onOpen() {
+    this.setState({
+      open: true
+    });
+  }
+
+  onClose() {
+    this.setState({
+      open: false
+    });
+  }
+
+  render() {
+    let view = (
+      <View style={styles.container}>
+          <Back onClick={() => this.navigation.pop()}/>
+          <HamburgerButton open={this.hamburger?.state?.open} onClick={() => this.hamburger?.open()}/>
+      </View>
+    );
+    return (
+      <Hamburger
+        ref={ref => this.hamburger = ref}
+        onClose={this.onClose.bind(this)}
+        onOpen={this.onOpen.bind(this)}
+        view={view}>
+          <HamburgerMenuButton onClick={() => this.navigation.push('Settings')} title="Settings" />
+          <HamburgerMenuButton onClick={() => this.navigation.push('Theme')} title="Theme" />
+          <HamburgerMenuButton onClick={() => this.navigation.push('Language')} title="Language" />
+          <HamburgerMenuButton onClick={() => this.navigation.push('Change')} title="Change Log" />
+      </Hamburger>
+    );
+  }
 }
 
 const styles = StyleSheet.create({

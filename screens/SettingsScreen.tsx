@@ -1,17 +1,16 @@
-import { StackScreenProps } from '@react-navigation/stack';
 import * as React from 'react';
-import { StyleSheet, Button, View, Text } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import Back from '../components/Back';
 import Colors from '../constants/Colors';
 
-import { RootStackParamList } from '../types';
+import { ScreenProps } from '../types';
 
 export default function SettingsScreen({
   navigation,
-}: StackScreenProps<RootStackParamList, 'Settings'>) {
+}: ScreenProps) {
   return (
     <View style={styles.container}>
-      <Button title="Home" onPress={_ => navigation.pop()}></Button>
-      <Text style={styles.title}>Settings</Text>
+      <Back onClick={() => navigation.pop()}/>
     </View>
   );
 }
@@ -27,4 +26,15 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
   },
+  back: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+
+    width: 60,
+    height: 60,
+
+    alignItems: 'center',
+    justifyContent: 'center'
+  }
 });
