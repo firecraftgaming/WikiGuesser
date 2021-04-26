@@ -36,7 +36,9 @@ export default class CreateScreen extends Component<ScreenProps, {}> {
           <Back onClick={() => this.navigation.pop()}/>
           <HamburgerButton open={this.hamburger?.state?.open} onClick={() => this.hamburger?.open()}/>
 
-          <FormObject title="Test"><FormSwitch></FormSwitch></FormObject>
+          <FormObject title="Slow Mode">
+            <FormSwitch></FormSwitch>
+          </FormObject>
       </View>
     );
     return (

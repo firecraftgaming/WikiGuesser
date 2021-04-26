@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
+import Colors from '../constants/Colors';
 
 type FormObjectParams = {
     title: string;
@@ -42,9 +43,9 @@ const styles = StyleSheet.create({
     main: {
         backgroundColor: '#C4C4C4',
         width: 315,
-        height: 40,
-        borderBottomLeftRadius: 10,
-        borderTopLeftRadius: 10,
+        height: 50,
+        borderBottomLeftRadius: 30,
+        borderTopLeftRadius: 30,
         borderBottomRightRadius: 65,
         borderTopRightRadius: 65,
 
@@ -52,9 +53,9 @@ const styles = StyleSheet.create({
     },
     title: {
         position: 'absolute',
-        left: 10,
+        left: 20,
         fontFamily: 'Robban',
-        fontSize: 25
+        fontSize: 30
     },
     components: {
         position: 'absolute',
@@ -62,11 +63,12 @@ const styles = StyleSheet.create({
     },
 
     switch: {
-        width: 70,
-        height: 40,
-        borderRadius: 20,
+        width: 80,
+        height: 50,
+        borderRadius: 65,
         borderWidth: 5,
-        borderColor: '#FF0000',
+        borderColor: '#863232',
+        backgroundColor: '#333333',
 
         justifyContent: 'center',
         alignItems: 'flex-end'
@@ -75,7 +77,8 @@ const styles = StyleSheet.create({
         width: 20,
         height: 20,
         borderRadius: 10,
-        backgroundColor: '#FF0000',
+        margin: 5,
+        backgroundColor: '#863232',
     }
 });
 
