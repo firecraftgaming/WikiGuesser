@@ -7,7 +7,7 @@ import Colors from '../constants/Colors';
 
 import { ScreenProps } from '../types';
 
-export default class JoinScreen extends Component<ScreenProps, {}> {
+export default class JoinScreen extends Component<ScreenProps, {open: boolean}> {
   private hamburger: Hamburger | null = null;
   private navigation: any;
 
@@ -33,7 +33,7 @@ export default class JoinScreen extends Component<ScreenProps, {}> {
     let view = (
       <View style={styles.container}>
         <Back onClick={() => this.navigation.pop()}/>
-        <HamburgerButton open={this.hamburger?.state?.open} onClick={() => this.hamburger?.open()}/>
+        <HamburgerButton open={this.state.open} onClick={() => this.hamburger?.open()}/>
       </View>
     );
     return (

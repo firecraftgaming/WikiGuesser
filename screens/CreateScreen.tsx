@@ -1,14 +1,16 @@
 import * as React from 'react';
 import { Component } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import Back from '../components/Back';
-import { FormObject, FormSwitch } from '../components/Form';
+import { FormObject, FormSwitch, FormRadio, RadioGroup, FormButton } from '../components/Form';
 import { Hamburger, HamburgerButton, HamburgerMenuButton } from '../components/Hamburger';
 import Colors from '../constants/Colors';
 
 import { ScreenProps } from '../types';
 
-export default class CreateScreen extends Component<ScreenProps, {}> {
+let radio_group = new RadioGroup();
+
+export default class CreateScreen extends Component<ScreenProps, {open: boolean}> {
   private hamburger: Hamburger | null = null;
   private navigation: any;
   
@@ -34,11 +36,19 @@ export default class CreateScreen extends Component<ScreenProps, {}> {
     let view = (
       <View style={styles.container}>
           <Back onClick={() => this.navigation.pop()}/>
-          <HamburgerButton open={this.hamburger?.state?.open} onClick={() => this.hamburger?.open()}/>
+          <HamburgerButton open={this.state.open} onClick={() => this.hamburger?.open()}/>
 
           <FormObject title="Slow Mode">
             <FormSwitch></FormSwitch>
           </FormObject>
+
+          <FormObject title="Local Multiplayer">
+            <FormRadio group={radio_group}></FormRadio>
+          </FormObject>
+          <FormObject title="Online Multiplayer">
+            <FormRadio group={radio_group}></FormRadio>
+          </FormObject>
+          <FormButton></FormButton>
       </View>
     );
     return (
@@ -61,7 +71,10 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: Colors.dark.background
+    backgroundColor: Colors.dark.background,
+
+    width: '100%',
+    height: '100%'
   },
   title: {
     fontSize: 20,

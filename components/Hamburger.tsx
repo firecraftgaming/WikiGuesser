@@ -105,7 +105,7 @@ class HamburgerButton extends Component<HamburgerButtonProps, {}> {
   }
 
   render() {
-    if (this.props.open) return;
+    if (this.props.open) return null;
     return (
       <TouchableOpacity
         onPress={_ => this.props.onClick()}

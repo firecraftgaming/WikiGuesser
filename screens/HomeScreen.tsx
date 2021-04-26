@@ -39,6 +39,7 @@ export default class HomeScreen extends Component<ScreenProps, {open: boolean}> 
             width: 400, 
             height: 125,
             resizeMode: 'contain',
+            marginBottom: 10,
             
             }} />
 
@@ -59,7 +60,7 @@ export default class HomeScreen extends Component<ScreenProps, {open: boolean}> 
             <Text style={styles.text}>Create</Text>
           </TouchableOpacity>
 
-          <HamburgerButton open={this.hamburger?.state?.open} onClick={() => this.hamburger?.open()}/>      
+          <HamburgerButton open={this.state.open} onClick={() => this.hamburger?.open()}/>      
         </View>
     );
     return (
