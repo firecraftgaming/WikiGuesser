@@ -35,12 +35,14 @@ export default class HomeScreen extends Component<ScreenProps, {open: boolean}> 
       <View 
         style={styles.container} >
 
-          <Image source={{uri: './asset/images/HomeScreen.png'}} style={{
+          <Image source={require('../assets/images/HomeScreen.png')} style={{
             width: 400, 
             height: 125,
             resizeMode: 'contain',
             
             }} />
+
+            
 
           <TouchableOpacity
             style={styles.button}
