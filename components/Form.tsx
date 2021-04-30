@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, useState } from 'react';
 import { StyleSheet, View, Text, Animated } from 'react-native';
 import { TouchableWithoutFeedback, TouchableOpacity } from 'react-native-gesture-handler';
 import { Next } from './images';
@@ -66,18 +66,24 @@ class FormSwitch extends Component<FormSwitchParams, { on: boolean }> {
 
 class RadioGroup {
   public radios: FormRadio[] = [];
+  public value: string | null = null;
 
-  public enable(radio: FormRadio) {
+  public listeners: Function[] = [];
+
+  public enable(radio: FormRadio, value: string) {
     for (let r of this.radios) {
       r.toggle(false);
     }
+    this.value = value;
+    this.listeners.forEach(v => v());
     radio.toggle(true);
   }
 }
 
 
 type FormRadioParams = {
-  group: RadioGroup
+  group: RadioGroup;
+  value: string;
 }
 class FormRadio extends Component<FormRadioParams, { on: boolean }> {
   constructor(props: FormRadioParams) {
@@ -93,7 +99,7 @@ class FormRadio extends Component<FormRadioParams, { on: boolean }> {
   }
 
   activate() {
-    this.props.group.enable(this);
+    this.props.group.enable(this, this.props.value);
   }
 
   render() {
@@ -146,7 +152,7 @@ const styles = StyleSheet.create({
         width: 70,
         height: 40,
         borderRadius: 65,
-        borderWidth: 3,
+        borderWidth: 4,
         borderColor: '#863232',
         backgroundColor: '#333333',
         marginRight: 10,
@@ -154,10 +160,10 @@ const styles = StyleSheet.create({
         justifyContent: 'center'
     },
     switchKnob: {
-        width: 28,
-        height: 28,
+        width: 26,
+        height: 26,
         borderRadius: 65,
-        margin: 2.5,
+        margin: 3.5,
         backgroundColor: '#863232',
     },
     
@@ -183,13 +189,11 @@ const styles = StyleSheet.create({
       width: 330,
       height: 55,
       borderRadius: 10,
-      backgroundColor: '#32863A', // gray=#626262
+      
 
       justifyContent: 'center',
-      alignItems: 'center',
-
-      position: 'absolute',
-      bottom: 0,
+      alignItems: 'flex-end',
+      backgroundColor: '#32863A', // gray=#626262
     }
 });
 

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Component } from 'react';
-import { StyleSheet, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, Text } from 'react-native';
 import Back from '../components/Back';
 import { FormObject, FormSwitch, FormRadio, RadioGroup, FormButton } from '../components/Form';
 import { Hamburger, HamburgerButton, HamburgerMenuButton } from '../components/Hamburger';
@@ -10,25 +10,36 @@ import { ScreenProps } from '../types';
 
 let radio_group = new RadioGroup();
 
-export default class CreateScreen extends Component<ScreenProps, {open: boolean}> {
+export default class CreateScreen extends Component<ScreenProps, {open: boolean, multiplayer: string | null}> {
   private hamburger: Hamburger | null = null;
   private navigation: any;
   
   constructor(props: ScreenProps) {
     super(props);
     this.navigation = props.navigation;
-    this.state = {open: false};
+    this.state = {open: false, multiplayer: null};
+
+    radio_group.listeners.push(this.onMultiplayerChange.bind(this));
   }
 
   onOpen() {
     this.setState({
-      open: true
+      open: true,
+      multiplayer: this.state.multiplayer
     });
   }
 
   onClose() {
     this.setState({
-      open: false
+      open: false,
+      multiplayer: this.state.multiplayer
+    });
+  }
+
+  onMultiplayerChange() {
+    this.setState({
+      open: this.state.open,
+      multiplayer: radio_group.value
     });
   }
 
@@ -38,17 +49,31 @@ export default class CreateScreen extends Component<ScreenProps, {open: boolean}
           <Back onClick={() => this.navigation.pop()}/>
           <HamburgerButton open={this.state.open} onClick={() => this.hamburger?.open()}/>
 
-          <FormObject title="Slow Mode">
-            <FormSwitch></FormSwitch>
-          </FormObject>
+          <View style={styles.topView}>
+            <FormObject title="Slow Mode">
+              <FormSwitch></FormSwitch>
+            </FormObject>
 
-          <FormObject title="Local Multiplayer">
-            <FormRadio group={radio_group}></FormRadio>
-          </FormObject>
-          <FormObject title="Online Multiplayer">
-            <FormRadio group={radio_group}></FormRadio>
-          </FormObject>
-          <FormButton></FormButton>
+            <FormObject title="Local Multiplayer">
+              <FormRadio group={radio_group} value="local"></FormRadio>
+            </FormObject>
+            <FormObject title="Online Multiplayer">
+              <FormRadio group={radio_group} value="online"></FormRadio>
+            </FormObject>
+
+            {
+              this.state.multiplayer == 'local' ? (
+                <Text>Local</Text>
+              ) : 
+              this.state.multiplayer == 'online' ? (
+                <Text>Online</Text>
+              ) : null
+            }
+          </View>
+
+          <View style={styles.bottomView}>
+            <FormButton></FormButton>
+          </View>
       </View>
     );
     return (
@@ -70,11 +95,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     backgroundColor: Colors.dark.background,
 
     width: '100%',
-    height: '100%'
+    height: '100%',
   },
   title: {
     fontSize: 20,
@@ -90,5 +115,13 @@ const styles = StyleSheet.create({
 
     alignItems: 'center',
     justifyContent: 'center'
+  },
+
+  topView: {
+    marginTop: 70,
+  },
+
+  bottomView: {
+    marginBottom: 20,
   }
 });
