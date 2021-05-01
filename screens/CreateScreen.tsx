@@ -1,47 +1,102 @@
 import * as React from 'react';
-import { Component } from 'react';
-import { StyleSheet, View, TouchableOpacity, Text } from 'react-native';
+import { StyleSheet, View, FlatList, Text } from 'react-native';
+import { TextInput } from 'react-native-gesture-handler';
 import Back from '../components/Back';
-import { FormObject, FormSwitch, FormRadio, RadioGroup, FormButton } from '../components/Form';
+import Plus from '../components/Plus';
+import { FormObject, FormSwitch, FormRadio, RadioGroup, FormSubmit } from '../components/Form';
 import { Hamburger, HamburgerButton, HamburgerMenuButton } from '../components/Hamburger';
 import Colors from '../constants/Colors';
 
+import fetch from 'node-fetch';
+
+import Screen from '../components/Screen';
 import { ScreenProps } from '../types';
+
+import { get, set } from '../location';
+
+
+const DATA = [
+  {
+    id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
+    title: 'Aron',
+  },
+  {
+    id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
+    title: 'Eliyah',
+  },
+  {
+    id: '58694a0f-3da1-471f-bd96-145571e29d72',
+    title: 'Billy',
+  },
+];
 
 let radio_group = new RadioGroup();
 
-export default class CreateScreen extends Component<ScreenProps, {open: boolean, multiplayer: string | null}> {
-  private hamburger: Hamburger | null = null;
-  private navigation: any;
+class Participant extends React.Component<{title: string}, {}> {
+  constructor(props: {title: string}) {
+    super(props);
+  }
+
+  render() {
+    return (
+      <Text>{this.props.title}</Text>
+    );
+  }
+}
+
+class Separator extends React.Component<{}, {}> {
+  constructor(props: {}) {
+    super(props);
+  }
+
+  render() {
+    return (
+      <View style={{
+        width: '100%',
+        height: 1,
+        backgroundColor: '#C4C4C4'
+      }}></View>
+    );
+  }
+}
+
+export default class CreateScreen extends Screen<{multiplayer: string | null, valid: boolean}> {
+  private code: string = '';
   
   constructor(props: ScreenProps) {
-    super(props);
-    this.navigation = props.navigation;
-    this.state = {open: false, multiplayer: null};
+    super(props, {valid: true});
 
-    radio_group.listeners.push(this.onMultiplayerChange.bind(this));
+    fetch('https://backend.wikiguesser.repl.co/code').then(v => v.json()).then(v => this.code = v.data);
   }
 
-  onOpen() {
+  onChange() {
+    let valid = true;
+
+
+
     this.setState({
-      open: true,
-      multiplayer: this.state.multiplayer
+      ...this.state,
+      valid
     });
   }
 
-  onClose() {
-    this.setState({
-      open: false,
-      multiplayer: this.state.multiplayer
-    });
+  componentDidMount() {
+    radio_group.listeners.set('update-screen', this.onMultiplayerChange.bind(this));
+  }
+
+  componentWillUnmount() {
+    radio_group.listeners.delete('update-screen');
   }
 
   onMultiplayerChange() {
     this.setState({
-      open: this.state.open,
+      ...this.state,
       multiplayer: radio_group.value
     });
+    //this.onChange();
   }
+
+  
 
   render() {
     let view = (
@@ -50,29 +105,48 @@ export default class CreateScreen extends Component<ScreenProps, {open: boolean,
           <HamburgerButton open={this.state.open} onClick={() => this.hamburger?.open()}/>
 
           <View style={styles.topView}>
-            <FormObject title="Slow Mode">
-              <FormSwitch></FormSwitch>
-            </FormObject>
-
+            {
+              <Text style={styles.title}>Create</Text>
+              /*
+                <FormObject title="Slow Mode" style={styles.bottomView}>
+                  <FormSwitch></FormSwitch>
+                </FormObject>
+              */
+            }
             <FormObject title="Local Multiplayer">
               <FormRadio group={radio_group} value="local"></FormRadio>
             </FormObject>
-            <FormObject title="Online Multiplayer">
+            <FormObject title="Online Multiplayer" style={styles.bottomView}>
               <FormRadio group={radio_group} value="online"></FormRadio>
             </FormObject>
 
+
+
             {
-              this.state.multiplayer == 'local' ? (
-                <Text>Local</Text>
-              ) : 
+              this.state.multiplayer == 'local' ? [
+                <FormObject key="add-participant">
+                  <TextInput placeholder="Participant" placeholderTextColor="#C4C4C4" style={styles.participantinput}/>
+                  <Plus onClick={() => null}/>
+                </FormObject>,
+                <FlatList
+                  data={DATA}
+                  renderItem={({item}) => (<Participant title={item.title}/>)}
+                  keyExtractor={item => item.id}
+                  key="participantlist"
+                  style={styles.participantlist}
+                  ItemSeparatorComponent={Separator}
+                />
+               ] : 
               this.state.multiplayer == 'online' ? (
-                <Text>Online</Text>
+                <FormObject key="userInput">
+                  <TextInput placeholder="Username" onChangeText={set} placeholderTextColor="#C4C4C4" style={styles.usernameinput}/>
+                </FormObject>
               ) : null
             }
           </View>
 
           <View style={styles.bottomView}>
-            <FormButton></FormButton>
+            <FormSubmit active={this.state.valid} onClick={() => this.navigation.push('HostLobby')}></FormSubmit>
           </View>
       </View>
     );
@@ -102,8 +176,11 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   title: {
-    fontSize: 20,
+    color: "#C4C4C4",
+    fontSize: 65,
+    textAlign: "center",
     fontWeight: 'bold',
+    marginBottom: 10,
   },
   back: {
     position: 'absolute',
@@ -118,10 +195,57 @@ const styles = StyleSheet.create({
   },
 
   topView: {
-    marginTop: 70,
+    marginTop: 100,
   },
 
   bottomView: {
     marginBottom: 20,
+    alignItems: 'center',
+  },
+
+  usernameinput: {
+    borderRadius: 8,
+
+    width: 305,
+    height: 40,
+
+    paddingLeft: 10,
+    fontSize: 23,
+    color: '#C4C4C4',
+
+    margin: 5,
+    backgroundColor: "#626262",
+  },
+
+  participantinput: {
+    borderRadius: 8,
+
+    width: 265,
+    height: 40,
+
+    paddingLeft: 10,
+    fontSize: 23,
+    color: '#C4C4C4',
+
+    margin: 45,
+    backgroundColor: "#626262"
+  },
+
+  participantlist: {
+    backgroundColor: "#626262",
+    color: "#C4C4C4",
+
+    height: 190,
+    width: 315,
+
+    flexGrow: 0,
+    alignSelf: 'center',
+    borderRadius: 10
+  },
+
+  code: {
+    fontFamily: 'Robban',
+    fontSize: 30,
+    marginRight: 10,
   }
 });

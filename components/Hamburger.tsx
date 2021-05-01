@@ -3,7 +3,7 @@ import Drawer from "react-native-drawer";
 import { StyleSheet, TouchableOpacity, View, Image, Text } from "react-native";
 
 type HamburgerProps = {
-    view: any;
+    view: JSX.Element;
     onOpen: Function;
     onClose: Function;
 }
@@ -12,9 +12,9 @@ class Hamburger extends Component<HamburgerProps, {open: boolean}> {
 
     constructor(props: HamburgerProps) {
         super(props);
-        this.setState({
+        this.state = {
             open: false
-        });
+        };
     }
 
     public static propTypes = {
@@ -25,14 +25,14 @@ class Hamburger extends Component<HamburgerProps, {open: boolean}> {
         this.setState({
             open: true
         });
-        (this.props as any).onOpen();
+        this.props.onOpen();
     }
 
     onClose() {
         this.setState({
             open: false
         });
-        (this.props as any).onClose();
+        this.props.onClose();
     }
 
     open() {

@@ -73,6 +73,8 @@ export default class HomeScreen extends Component<ScreenProps, {open: boolean}> 
         <HamburgerMenuButton onClick={() => this.navigation.push('Theme')} title="Theme" />
         <HamburgerMenuButton onClick={() => this.navigation.push('Language')} title="Language" />
         <HamburgerMenuButton onClick={() => this.navigation.push('Change')} title="Change Log" />
+        <HamburgerMenuButton onClick={() => this.navigation.push('HostLobby')} title="Host" />
+        <HamburgerMenuButton onClick={() => this.navigation.push('ParticipantLobby')} title="Participant" />
       </Hamburger>
     );
   }

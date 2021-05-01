@@ -25,8 +25,8 @@ function RootNavigator() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       {
-        [...screens.keys()].map(v => (
-          <Stack.Screen name={v} component={screens.get(v)} />
+        [...screens.keys()].map((v, i) => (
+          <Stack.Screen name={v} component={screens.get(v)} key={i}/>
         ))
       }
     </Stack.Navigator>

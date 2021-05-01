@@ -4,18 +4,23 @@ import { TouchableWithoutFeedback, TouchableOpacity } from 'react-native-gesture
 import { Next } from './images';
 
 type FormObjectParams = {
-    title: string;
+    title?: string;
+    style?: any;
 }
 class FormObject extends Component<FormObjectParams, {}> {
+  private style: any;
+
   constructor(props: FormObjectParams) {
     super(props);
-
+    this.style = this.props.style ?? {};
   }
 
   render() {
     return (
-        <View style={styles.main}>
-            <Text style={styles.title}>{this.props.title}</Text>
+        <View style={[styles.main, this.style]}>
+            {
+              this.props.title ? (<Text style={styles.title}>{this.props.title}</Text>) : null
+            }
             <View style={styles.components}>
                 {this.props.children}
             </View>
@@ -65,10 +70,10 @@ class FormSwitch extends Component<FormSwitchParams, { on: boolean }> {
 }
 
 class RadioGroup {
-  public radios: FormRadio[] = [];
+  public radios: Set<FormRadio> = new Set<FormRadio>();
   public value: string | null = null;
 
-  public listeners: Function[] = [];
+  public listeners: Map<string, Function> = new Map<string, Function>();
 
   public enable(radio: FormRadio, value: string) {
     for (let r of this.radios) {
@@ -89,7 +94,14 @@ class FormRadio extends Component<FormRadioParams, { on: boolean }> {
   constructor(props: FormRadioParams) {
     super(props);
     this.state = {on: false};
-    this.props.group.radios.push(this);
+  }
+
+  componentDidMount() {
+    this.props.group.radios.add(this);
+  }
+
+  componentWillUnmount() {
+    this.props.group.radios.delete(this);
   }
 
   toggle(on: boolean) {
@@ -111,17 +123,23 @@ class FormRadio extends Component<FormRadioParams, { on: boolean }> {
   }
 }
 
-type FormButtonParams = {
+type FormSubmitParams = {
+  onClick: Function;
+  active: boolean;
 }
-class FormButton extends Component<FormButtonParams, {}> {
-  constructor(props: FormButtonParams) {
+class FormSubmit extends Component<FormSubmitParams, {}> {
+  constructor(props: FormSubmitParams) {
     super(props);
   }
 
   render() {
     return (
-      <TouchableOpacity style={styles.button} activeOpacity={0.7}>
-        <Next></Next>
+      <TouchableOpacity disabled={!this.props.active} style={{...styles.button, backgroundColor: this.props.active ? '#32863A' : '#626262'}} activeOpacity={0.7} onPress={() => this.props.onClick()}>
+        {
+          this.props.active ? (
+            <Next></Next>
+          ) : null
+        }
       </TouchableOpacity>
     );
   }
@@ -192,9 +210,8 @@ const styles = StyleSheet.create({
       
 
       justifyContent: 'center',
-      alignItems: 'flex-end',
-      backgroundColor: '#32863A', // gray=#626262
+      alignItems: 'flex-end'
     }
 });
 
-export { FormObject, FormSwitch, FormRadio, RadioGroup, FormButton }
+export { FormObject, FormSwitch, FormRadio, RadioGroup, FormSubmit }

@@ -1,18 +1,37 @@
 import * as React from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, Image } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import Back from '../components/Back';
 import Colors from '../constants/Colors';
+import Screen from '../components/Screen';
 
 import { ScreenProps } from '../types';
+import { HamburgerButton, Hamburger, HamburgerMenuButton } from '../components/Hamburger';
 
-export default function CHANGE_THIS_Screen({
-  navigation,
-}: ScreenProps) {
-  return (
-    <View style={styles.container}>
-      <Back onClick={() => navigation.pop()}/>
-    </View>
-  );
+export default class JoinScreen extends Screen {
+  constructor(props: ScreenProps) {
+    super(props);
+  }
+
+  render()  {
+    let view = (
+      <View style={styles.container}>
+          <Back onClick={() => this.navigation.pop()}/>
+          <HamburgerButton open={this.state.open} onClick={() => this.hamburger?.open()}/>
+      </View>
+    );
+    return (
+      <Hamburger
+        ref={ref => this.hamburger = ref}
+        onClose={this.onClose.bind(this)}
+        onOpen={this.onOpen.bind(this)}
+        view={view}>
+          <HamburgerMenuButton onClick={() => this.navigation.push('Settings')} title="Settings" />
+          <HamburgerMenuButton onClick={() => this.navigation.push('Theme')} title="Theme" />
+          <HamburgerMenuButton onClick={() => this.navigation.push('Language')} title="Language" />
+          <HamburgerMenuButton onClick={() => this.navigation.push('Change')} title="Change Log" />
+      </Hamburger>
+    );
+  }
 }
 
 const styles = StyleSheet.create({
@@ -21,20 +40,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: Colors.dark.background
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  back: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-
-    width: 60,
-    height: 60,
-
-    alignItems: 'center',
-    justifyContent: 'center'
   }
 });

@@ -1,32 +1,32 @@
 import React, { Component } from "react";
 import { StyleSheet, TouchableOpacity, Image } from "react-native";
-import { Back as BackImage } from './images';
+import { Plus as PlusImage } from './images';
 
-type BackProps = {
+type PlusProps = {
     onClick: Function
 }
 
-class Back extends Component<BackProps, {}> {
-    constructor(props: BackProps) {
+class Plus extends Component<PlusProps, {}> {
+    constructor(props: PlusProps) {
         super(props);
     }
     render() {
         return (
             <TouchableOpacity
-                style={styles.back}
+                style={styles.plus}
                 onPress={_ => this.props.onClick()}
                 >
-                <BackImage/>
+                <PlusImage/>
             </TouchableOpacity>
         );
     }
 }
 
 const styles = StyleSheet.create({
-    back: {
+    plus: {
       position: 'absolute',
-      top: 0,
-      left: 0,
+      top: 35,
+      left: 300,
   
       width: 60,
       height: 60,
@@ -36,4 +36,4 @@ const styles = StyleSheet.create({
     }
   });
 
-export default Back;
+export default Plus;
