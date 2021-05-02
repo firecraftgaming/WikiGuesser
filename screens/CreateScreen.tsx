@@ -17,16 +17,36 @@ import { get, set } from '../location';
 
 const DATA = [
   {
-    id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
+    id: '0',
     title: 'Aron',
   },
   {
-    id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
+    id: '1',
     title: 'Eliyah',
   },
   {
-    id: '58694a0f-3da1-471f-bd96-145571e29d72',
+    id: '2',
+    title: 'Bob',
+  },
+  {
+    id: '3',
     title: 'Billy',
+  },
+  {
+    id: '4',
+    title: 'Bengt',
+  },
+  {
+    id: '5',
+    title: 'Bob',
+  },
+  {
+    id: '6',
+    title: 'Billy',
+  },
+  {
+    id: '7',
+    title: 'Bengt',
   },
 ];
 
@@ -39,7 +59,7 @@ class Participant extends React.Component<{title: string}, {}> {
 
   render() {
     return (
-      <Text>{this.props.title}</Text>
+      <Text style={styles.participant}>{this.props.title}</Text>
     );
   }
 }
@@ -51,11 +71,7 @@ class Separator extends React.Component<{}, {}> {
 
   render() {
     return (
-      <View style={{
-        width: '100%',
-        height: 1,
-        backgroundColor: '#C4C4C4'
-      }}></View>
+      <View style={styles.separator}></View>
     );
   }
 }
@@ -139,7 +155,7 @@ export default class CreateScreen extends Screen<{multiplayer: string | null, va
                ] : 
               this.state.multiplayer == 'online' ? (
                 <FormObject key="userInput">
-                  <TextInput placeholder="Username" onChangeText={set} placeholderTextColor="#C4C4C4" style={styles.usernameinput}/>
+                  <TextInput placeholder="Username" onChangeText={v => set('username', v)} placeholderTextColor="#C4C4C4" style={styles.usernameinput}/>
                 </FormObject>
               ) : null
             }
@@ -238,14 +254,30 @@ const styles = StyleSheet.create({
     height: 190,
     width: 315,
 
+    paddingTop: 8,
+
     flexGrow: 0,
     alignSelf: 'center',
     borderRadius: 10
+  },
+  
+  participant: {
+    fontSize: 23,
+    color: "#C4C4C4",
+    paddingLeft: 10,
+  },
+
+  separator: {
+    width: 315,
+    height: 2,
+    backgroundColor: "#C4C4C4",
+    marginTop: 8,
+    marginBottom: 8,
   },
 
   code: {
     fontFamily: 'Robban',
     fontSize: 30,
     marginRight: 10,
-  }
+  },
 });

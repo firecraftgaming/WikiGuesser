@@ -7,27 +7,79 @@ import { Hamburger, HamburgerButton, HamburgerMenuButton } from '../components/H
 import Colors from '../constants/Colors';
 
 import { ScreenProps } from '../types';
+import { get } from '../location';
+import { RadioGroup } from '../components/Form';
+
+import { socket } from '../socket';
 
 const DATA = [
-    {
-      id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
-      title: 'Aron',
-    },
-    {
-      id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
-      title: 'Eliyah',
-    },
-    {
-      id: '58694a0f-3da1-471f-bd96-145571e29d72',
-      title: 'Billy',
-    },
-  ];
+  {
+    id: '0',
+    title: 'Aron',
+  },
+  {
+    id: '1',
+    title: 'Eliyah',
+  },
+  {
+    id: '2',
+    title: 'Bob',
+  },
+  {
+    id: '3',
+    title: 'Billy',
+  },
+  {
+    id: '4',
+    title: 'Bengt',
+  },
+  {
+    id: '5',
+    title: 'Bob',
+  },
+  {
+    id: '6',
+    title: 'Billy',
+  },
+  {
+    id: '7',
+    title: 'Bengt',
+  },
+];
+
+let radio_group = new RadioGroup();
+
+class Participant extends React.Component<{title: string}, {}> {
+  constructor(props: {title: string}) {
+    super(props);
+  }
+
+  render() {
+    return (
+      <Text style={styles.participant}>{this.props.title}</Text>
+    );
+  }
+}
+
+class Separator extends React.Component<{}, {}> {
+  constructor(props: {}) {
+    super(props);
+  }
+
+  render() {
+    return (
+      <View style={styles.separator}></View>
+    );
+  }
+}
 
 
-export default class ParticipantLobbyScreen extends Screen<{code: string}> {
+export default class ParticipantLobbyScreen extends Screen<{}> {
     constructor(props: ScreenProps) {
-        super(props, {code: ''});
-        fetch('https://backend.wikiguesser.repl.co/code').then(v => v.json()).then(v => this.setState({...this.state, code: v.data}));
+        super(props);
+        socket.emit('join', get('username'), get('code'));
+        socket.on('error', (id, msg) => console.log(id, msg));
+        socket.on('ready', (type, id) => console.log(type, id));
     }
     
     render()  {
@@ -37,14 +89,15 @@ export default class ParticipantLobbyScreen extends Screen<{code: string}> {
                 <HamburgerButton open={this.state.open} onClick={() => this.hamburger?.open()}/>
                 
                 <View style={styles.topView}>
-                    <Text style={styles.header}>{this.state.code}</Text>
+                    <Text style={styles.header}>{get('code')}</Text>
                     <FlatList
-                  data={DATA}
-                  renderItem={null}
-                  keyExtractor={item => item.id}
-                  key="participantlist"
-                  style={styles.participantlist}
-                />
+                      data={DATA}
+                      renderItem={({item}) => (<Participant title={item.title}/>)}
+                      keyExtractor={item => item.id}
+                      key="participantlist"
+                      style={styles.participantlist}
+                      ItemSeparatorComponent={Separator}
+                    />
                 <Crown style={styles.crown}/>
                 </View>
             </View>
@@ -100,6 +153,24 @@ const styles = StyleSheet.create({
     marginTop: 175,
     marginBottom: 30,
   },
+
+  crown:  {
+    
+  },
+  participantinput: {
+    borderRadius: 8,
+
+    width: 265,
+    height: 40,
+
+    paddingLeft: 10,
+    fontSize: 23,
+    color: '#C4C4C4',
+
+    margin: 45,
+    backgroundColor: "#626262"
+  },
+
   participantlist: {
     backgroundColor: "#626262",
     color: "#C4C4C4",
@@ -107,11 +178,24 @@ const styles = StyleSheet.create({
     height: 190,
     width: 315,
 
+    paddingTop: 8,
+
     flexGrow: 0,
     alignSelf: 'center',
     borderRadius: 10
   },
-  crown:  {
-    
-  }
+  
+  participant: {
+    fontSize: 23,
+    color: "#C4C4C4",
+    paddingLeft: 10,
+  },
+
+  separator: {
+    width: 315,
+    height: 2,
+    backgroundColor: "#C4C4C4",
+    marginTop: 8,
+    marginBottom: 8,
+  },
 });

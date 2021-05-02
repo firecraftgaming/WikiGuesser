@@ -7,7 +7,7 @@ import Screen from '../components/Screen';
 import { ScreenProps } from '../types';
 import { HamburgerButton, Hamburger, HamburgerMenuButton } from '../components/Hamburger';
 
-export default class JoinScreen extends Screen {
+export default class JoinScreen extends Screen<{}> {
   constructor(props: ScreenProps) {
     super(props);
   }

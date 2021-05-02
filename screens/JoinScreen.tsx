@@ -42,12 +42,16 @@ export default class JoinScreen extends Screen<{valid: boolean}> {
               <TextInput placeholder="Username" placeholderTextColor="#C4C4C4" style={styles.textinput} onChangeText={v => {
                 this.user = v;
                 this.onChange();
+
+                set('username', v);
               }}/>
             </FormObject>
             <FormObject title="Join Code" key="code">
               <TextInput placeholder="Code" placeholderTextColor="#C4C4C4" keyboardType="number-pad" style={styles.textinput} onChangeText={v => {
                 this.code = v;
                 this.onChange();
+                
+                set('code', v);
               }}/>
             </FormObject>
           </View>
