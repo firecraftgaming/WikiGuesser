@@ -1,17 +1,16 @@
-declare module globalThis {
-    let data: Map<string, any>;
-}
+import { sessionStorage } from './Storage';
 
-globalThis.data = new Map<string, any>();
-
-function get(key: string) : any {
-    return globalThis.data.get(key);
+function get(key: string) {
+    return sessionStorage.getItem(key);
 }
 function set(key: string, value: any) {
-    globalThis.data.set(key, value);
+    sessionStorage.setItem(key, value);
 }
 function has(key: string) {
-    return globalThis.data.has(key);
+    return sessionStorage.getItem(key) !== undefined;
+}
+function remove(key: string) {
+    sessionStorage.removeItem(key);
 }
 
-export { set, get, has };
+export { set, get, has, remove };

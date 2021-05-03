@@ -1,21 +1,23 @@
 import * as React from 'react';
+import { Component } from 'react';
 import { StyleSheet, View, Text, TextInput } from 'react-native';
 import Back from '../components/Back';
 import { FormObject, FormSubmit } from '../components/Form';
-import { Hamburger, HamburgerButton, HamburgerMenuButton } from '../components/Hamburger';
+import Settings from '../components/Settings';
 import Colors from '../constants/Colors';
-import Screen from '../components/Screen';
 
 import { get, set } from '../location';
+import { socket, request } from '../socket';
 
 import { ScreenProps } from '../types';
 
-export default class JoinScreen extends Screen<{valid: boolean}> {
+export default class JoinScreen extends Component<ScreenProps, {valid: boolean, error: boolean}> {
   private user = '';
   private code = '';
 
   constructor(props: ScreenProps) {
-    super(props, {valid: false});
+    super(props);
+    this.state = {valid: false, error: false};
   }
 
   onChange() {
@@ -25,16 +27,16 @@ export default class JoinScreen extends Screen<{valid: boolean}> {
     if (this.code == '') valid = false;
 
     this.setState({
-      ...this.state,
+      error: false,
       valid
     });
   }
   
-  render()  {
-    let view = (
+  render() {
+    return (
       <View style={styles.container}>
-          <Back onClick={() => this.navigation.pop()}/>
-          <HamburgerButton open={this.state.open} onClick={() => this.hamburger?.open()}/>
+          <Back onClick={() => this.props.navigation.pop()}/>
+          <Settings onClick={() => this.props.navigation.push('Settings')}/>
           
           <View style={styles.topView}>
             <Text style={styles.header}>Join</Text>
@@ -46,7 +48,7 @@ export default class JoinScreen extends Screen<{valid: boolean}> {
                 set('username', v);
               }}/>
             </FormObject>
-            <FormObject title="Join Code" key="code">
+            <FormObject title="Join Code" key="code" style={this.state.error ? {backgroundColor: 'red'} : {}}>
               <TextInput placeholder="Code" placeholderTextColor="#C4C4C4" keyboardType="number-pad" style={styles.textinput} onChangeText={v => {
                 this.code = v;
                 this.onChange();
@@ -57,21 +59,19 @@ export default class JoinScreen extends Screen<{valid: boolean}> {
           </View>
 
           <View style={styles.bottomView}>
-            <FormSubmit active={this.state.valid} onClick={() => this.navigation.push('ParticipantLobby')}></FormSubmit>
+            <FormSubmit active={this.state.valid} onClick={() => {
+              request('join', get('username'), get('code')).then(v => {
+                this.props.navigation.push('ParticipantLobby');
+              }).catch(e => {
+                console.log(e);
+                this.setState({
+                  error: true
+                });
+              });
+              
+            }}></FormSubmit>
           </View>
       </View>
-    );
-    return (
-      <Hamburger
-        ref={ref => this.hamburger = ref}
-        onClose={this.onClose.bind(this)}
-        onOpen={this.onOpen.bind(this)}
-        view={view}>
-          <HamburgerMenuButton onClick={() => this.navigation.push('Settings')} title="Settings" />
-          <HamburgerMenuButton onClick={() => this.navigation.push('Theme')} title="Theme" />
-          <HamburgerMenuButton onClick={() => this.navigation.push('Language')} title="Language" />
-          <HamburgerMenuButton onClick={() => this.navigation.push('Change')} title="Change Log" />
-      </Hamburger>
     );
   }
 }

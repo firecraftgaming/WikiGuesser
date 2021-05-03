@@ -1,124 +1,77 @@
 import * as React from 'react';
-import { StyleSheet, View, Text, FlatList } from 'react-native';
+import { StyleSheet, View, Text, Alert } from 'react-native';
 import Back from '../components/Back';
-import Screen from '../components/Screen';
-import { Hamburger, HamburgerButton, HamburgerMenuButton } from '../components/Hamburger';
 import Colors from '../constants/Colors';
 
 import { ScreenProps } from '../types';
-import { FormObject, FormSubmit, RadioGroup } from '../components/Form';
+import { FormObject, FormSubmit } from '../components/Form';
 import { get } from '../location';
+import { socket, request } from '../socket';
+import { Player, PlayerList } from '../components/Participant';
+import { Component } from 'react';
+import Settings from '../components/Settings';
 
-import { socket } from '../socket';
+export default class HostLobbyScreen extends Component<ScreenProps, {code: string}> {
+    public players: Player[] = [];
 
-const DATA = [
-  {
-    id: '0',
-    title: 'Aron',
-  },
-  {
-    id: '1',
-    title: 'Eliyah',
-  },
-  {
-    id: '2',
-    title: 'Bob',
-  },
-  {
-    id: '3',
-    title: 'Billy',
-  },
-  {
-    id: '4',
-    title: 'Bengt',
-  },
-  {
-    id: '5',
-    title: 'Bob',
-  },
-  {
-    id: '6',
-    title: 'Billy',
-  },
-  {
-    id: '7',
-    title: 'Bengt',
-  },
-];
-
-let radio_group = new RadioGroup();
-
-class Participant extends React.Component<{title: string}, {}> {
-  constructor(props: {title: string}) {
-    super(props);
-  }
-
-  render() {
-    return (
-      <Text style={styles.participant}>{this.props.title}</Text>
-    );
-  }
-}
-
-class Separator extends React.Component<{}, {}> {
-  constructor(props: {}) {
-    super(props);
-  }
-
-  render() {
-    return (
-      <View style={styles.separator}></View>
-    );
-  }
-}
-
-
-
-export default class HostLobbyScreen extends Screen<{code: string}> {
     constructor(props: ScreenProps) {
-        super(props, {code: ''});
+        super(props);
+        this.state = {code: ''};
 
-        socket.emit('create', get('username'));
-        socket.on('error', (id, msg) => console.log(id, msg));
-        socket.on('ready', (type, id) => console.log(type, id));
+        socket.on('player-list', players => {
+          this.players = players;
+          this.forceUpdate();
+        });
+
+        request('create', get('username')).then(v => {
+          this.setState({
+            ...this.state, 
+            code: v.code
+          });
+        }).catch(e => console.error(e));
+    }
+
+    kick(index: number) {
+      //TODO: Send id to server for kick
     }
     
     render()  {
-        let view = (
+        return (
             <View style={styles.container}>
-                <Back onClick={() => this.navigation.pop()}/>
-                <HamburgerButton open={this.state.open} onClick={() => this.hamburger?.open()}/>
+                <Back onClick={() => Alert.alert(
+                  "Leave",
+                  "Are you sure you want to leave?",
+                  [
+                    {
+                      text: "No",
+                      style: "cancel"
+                    },
+                    { 
+                      text: "Yes", 
+                      onPress: () => {
+                        socket.emit('reset');
+                        this.props.navigation.pop();
+                      } 
+                    }
+                  ]
+                )}/>
+                <Settings onClick={() => this.props.navigation.push('Settings')}/>
+                <View></View>
                 
-                <View style={styles.topView}>
+                <View>
                     <Text style={styles.header}>{this.state.code}</Text>
-                    <FlatList
-                      data={DATA}
-                      renderItem={({item}) => (<Participant title={item.title}/>)}
-                      keyExtractor={item => item.id}
-                      key="participantlist"
-                      style={styles.participantlist}
-                      ItemSeparatorComponent={Separator}
+                    <PlayerList
+                      DATA={this.players}
+                      removable={true}
+                      removeCallback={this.kick.bind(this)}
+                      nameExtractor={item => item.name}
                     />
                 </View>
                 
                 <View style={styles.bottomView}>
-                    <FormObject style={styles.user} title={get('name ')}/>
                     <FormSubmit active={true} onClick={() => null}></FormSubmit>
                 </View>
             </View>
-        );
-        return (
-            <Hamburger
-                ref={ref => this.hamburger = ref}
-                onClose={this.onClose.bind(this)}
-                onOpen={this.onOpen.bind(this)}
-                view={view}>
-                <HamburgerMenuButton onClick={() => this.navigation.push('Settings')} title="Settings" />
-                <HamburgerMenuButton onClick={() => this.navigation.push('Theme')} title="Theme" />
-                <HamburgerMenuButton onClick={() => this.navigation.push('Language')} title="Language" />
-                <HamburgerMenuButton onClick={() => this.navigation.push('Change')} title="Change Log" />
-                <HamburgerMenuButton onClick={() => this.navigation.push('ParticipantLobby')} title="Participant" />
-            </Hamburger>
         );
     }
 }
@@ -133,21 +86,6 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  back: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-
-    width: 60,
-    height: 60, 
-
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
   topView: {
     marginTop: 70,
   },
@@ -161,53 +99,5 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: 175,
     marginBottom: 30,
-  },
-  user: {
-    minWidth: 100,
-    alignSelf: 'flex-start',
-    marginLeft: 0,
-    fontSize: 23,
-  },
-
-  participantinput: {
-    borderRadius: 8,
-
-    width: 265,
-    height: 40,
-
-    paddingLeft: 10,
-    fontSize: 23,
-    color: '#C4C4C4',
-
-    margin: 45,
-    backgroundColor: "#626262"
-  },
-
-  participantlist: {
-    backgroundColor: "#626262",
-    color: "#C4C4C4",
-
-    height: 190,
-    width: 315,
-
-    paddingTop: 8,
-
-    flexGrow: 0,
-    alignSelf: 'center',
-    borderRadius: 10
-  },
-  
-  participant: {
-    fontSize: 23,
-    color: "#C4C4C4",
-    paddingLeft: 10,
-  },
-
-  separator: {
-    width: 315,
-    height: 2,
-    backgroundColor: "#C4C4C4",
-    marginTop: 8,
-    marginBottom: 8,
   },
 });

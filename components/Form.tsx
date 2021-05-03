@@ -8,16 +8,14 @@ type FormObjectParams = {
     style?: any;
 }
 class FormObject extends Component<FormObjectParams, {}> {
-  private style: any;
 
   constructor(props: FormObjectParams) {
     super(props);
-    this.style = this.props.style ?? {};
   }
 
   render() {
     return (
-        <View style={[styles.main, this.style]}>
+        <View style={[styles.main, this.props.style]}>
             {
               this.props.title ? (<Text style={styles.title}>{this.props.title}</Text>) : null
             }

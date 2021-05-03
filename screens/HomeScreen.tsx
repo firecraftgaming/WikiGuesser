@@ -5,33 +5,16 @@ import Colors from '../constants/Colors';
 
 import { ScreenProps } from '../types';
 import { Component } from 'react';
-import { Hamburger, HamburgerButton, HamburgerMenuButton } from '../components/Hamburger';
+import Settings from '../components/Settings';
 
-export default class HomeScreen extends Component<ScreenProps, {open: boolean}> {
+export default class HomeScreen extends Component<ScreenProps> {
 
-  private hamburger: Hamburger | null = null;
-  private navigation: any;
-  
   constructor(props: ScreenProps) {
     super(props);
-    this.navigation = props.navigation;
-    this.state = {open: false};
-  }
-
-  onOpen() {
-    this.setState({
-      open: true
-    });
-  }
-
-  onClose() {
-    this.setState({
-      open: false
-    });
   }
 
   render() {
-    let view = (
+    return (
       <View 
         style={styles.container} >
 
@@ -47,55 +30,24 @@ export default class HomeScreen extends Component<ScreenProps, {open: boolean}> 
 
           <TouchableOpacity
             style={styles.button}
-            onPress={_ => this.navigation.push('Join')}
+            onPress={_ => this.props.navigation.push('Join')}
             
           >
             <Text style={styles.text}>Join</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.button}
-            onPress={_ => this.navigation.push('Create')}
+            onPress={_ => this.props.navigation.push('Create')}
             
           >
             <Text style={styles.text}>Create</Text>
           </TouchableOpacity>
 
-          <HamburgerButton open={this.state.open} onClick={() => this.hamburger?.open()}/>      
+          <Settings onClick={() => this.props.navigation.push('Settings')}/>
         </View>
-    );
-    return (
-      <Hamburger
-      ref={ref => this.hamburger = ref}
-      onClose={this.onClose.bind(this)}
-      onOpen={this.onOpen.bind(this)}
-      view={view}>
-        <HamburgerMenuButton onClick={() => this.navigation.push('Settings')} title="Settings" />
-        <HamburgerMenuButton onClick={() => this.navigation.push('Theme')} title="Theme" />
-        <HamburgerMenuButton onClick={() => this.navigation.push('Language')} title="Language" />
-        <HamburgerMenuButton onClick={() => this.navigation.push('Change')} title="Change Log" />
-        <HamburgerMenuButton onClick={() => this.navigation.push('HostLobby')} title="Host" />
-        <HamburgerMenuButton onClick={() => this.navigation.push('ParticipantLobby')} title="Participant" />
-      </Hamburger>
     );
   }
 }
-
-const DrawerStyles = {
-  drawer: {
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
-    borderRightWidth: 2,
-    borderColor: 'rgba(34, 34, 34, 1)',
-    shadowColor: '#000',
-    shadowOpacity: 0.58,
-    shadowOffset: {
-      width: 5,
-      height: 0
-    }
-  },
-  main: {
-
-  }
-};
 
 const styles = StyleSheet.create({
   container: {

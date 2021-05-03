@@ -1,97 +1,53 @@
 import * as React from 'react';
-import { StyleSheet, View, FlatList, Text } from 'react-native';
+import { StyleSheet, View, FlatList, Text, Keyboard, TextInputComponent } from 'react-native';
 import { TextInput } from 'react-native-gesture-handler';
 import Back from '../components/Back';
 import Plus from '../components/Plus';
+import Minus from '../components/Minus';
 import { FormObject, FormSwitch, FormRadio, RadioGroup, FormSubmit } from '../components/Form';
-import { Hamburger, HamburgerButton, HamburgerMenuButton } from '../components/Hamburger';
 import Colors from '../constants/Colors';
 
 import fetch from 'node-fetch';
-
-import Screen from '../components/Screen';
 import { ScreenProps } from '../types';
 
 import { get, set } from '../location';
+import { LocalMultiplayerView, Participant, Separator } from '../components/Participant';
+import Settings from '../components/Settings';
+import { Component } from 'react';
 
 
-const DATA = [
-  {
-    id: '0',
-    title: 'Aron',
-  },
-  {
-    id: '1',
-    title: 'Eliyah',
-  },
-  {
-    id: '2',
-    title: 'Bob',
-  },
-  {
-    id: '3',
-    title: 'Billy',
-  },
-  {
-    id: '4',
-    title: 'Bengt',
-  },
-  {
-    id: '5',
-    title: 'Bob',
-  },
-  {
-    id: '6',
-    title: 'Billy',
-  },
-  {
-    id: '7',
-    title: 'Bengt',
-  },
-];
+const DATA: string[] = [];
 
 let radio_group = new RadioGroup();
 
-class Participant extends React.Component<{title: string}, {}> {
-  constructor(props: {title: string}) {
-    super(props);
-  }
 
-  render() {
-    return (
-      <Text style={styles.participant}>{this.props.title}</Text>
-    );
-  }
-}
+export default class CreateScreen extends Component<ScreenProps, {multiplayer: string | null, valid: boolean}> {
+  private list = React.createRef<FlatList>();
 
-class Separator extends React.Component<{}, {}> {
-  constructor(props: {}) {
-    super(props);
-  }
-
-  render() {
-    return (
-      <View style={styles.separator}></View>
-    );
-  }
-}
-
-export default class CreateScreen extends Screen<{multiplayer: string | null, valid: boolean}> {
-  private code: string = '';
-  
   constructor(props: ScreenProps) {
-    super(props, {valid: true});
-
-    fetch('https://backend.wikiguesser.repl.co/code').then(v => v.json()).then(v => this.code = v.data);
+    super(props);
+    this.state = {
+      valid: false,
+      multiplayer: null
+    };
   }
 
   onChange() {
     let valid = true;
 
-
+    switch (this.state.multiplayer) {
+      case 'local':
+        if (DATA.length < 2) valid = false;
+        break;
+      case 'online':
+        if (get('username').trim().length < 1) valid = false;
+        break;
+      default:
+        valid = false;
+        break;
+    }
 
     this.setState({
-      ...this.state,
       valid
     });
   }
@@ -106,19 +62,18 @@ export default class CreateScreen extends Screen<{multiplayer: string | null, va
 
   onMultiplayerChange() {
     this.setState({
-      ...this.state,
       multiplayer: radio_group.value
     });
-    //this.onChange();
+    this.onChange();
   }
 
   
 
   render() {
-    let view = (
+    return (
       <View style={styles.container}>
-          <Back onClick={() => this.navigation.pop()}/>
-          <HamburgerButton open={this.state.open} onClick={() => this.hamburger?.open()}/>
+          <Back onClick={() => this.props.navigation.pop()}/>
+          <Settings onClick={() => this.props.navigation.push('Settings')}/>
 
           <View style={styles.topView}>
             {
@@ -139,44 +94,22 @@ export default class CreateScreen extends Screen<{multiplayer: string | null, va
 
 
             {
-              this.state.multiplayer == 'local' ? [
-                <FormObject key="add-participant">
-                  <TextInput placeholder="Participant" placeholderTextColor="#C4C4C4" style={styles.participantinput}/>
-                  <Plus onClick={() => null}/>
-                </FormObject>,
-                <FlatList
-                  data={DATA}
-                  renderItem={({item}) => (<Participant title={item.title}/>)}
-                  keyExtractor={item => item.id}
-                  key="participantlist"
-                  style={styles.participantlist}
-                  ItemSeparatorComponent={Separator}
-                />
-               ] : 
+              this.state.multiplayer == 'local' ? <LocalMultiplayerView DATA={DATA} onChange={() => this.onChange()}/> : 
               this.state.multiplayer == 'online' ? (
                 <FormObject key="userInput">
-                  <TextInput placeholder="Username" onChangeText={v => set('username', v)} placeholderTextColor="#C4C4C4" style={styles.usernameinput}/>
+                  <TextInput placeholder="Username" onChangeText={v => {
+                    set('username', v);
+                    this.onChange();
+                  }} placeholderTextColor="#C4C4C4" style={styles.usernameinput}/>
                 </FormObject>
               ) : null
             }
           </View>
 
           <View style={styles.bottomView}>
-            <FormSubmit active={this.state.valid} onClick={() => this.navigation.push('HostLobby')}></FormSubmit>
+            <FormSubmit active={this.state.valid} onClick={() => this.props.navigation.push('HostLobby')}></FormSubmit>
           </View>
       </View>
-    );
-    return (
-      <Hamburger
-        ref={ref => this.hamburger = ref}
-        onClose={this.onClose.bind(this)}
-        onOpen={this.onOpen.bind(this)}
-        view={view}>
-          <HamburgerMenuButton onClick={() => this.navigation.push('Settings')} title="Settings" />
-          <HamburgerMenuButton onClick={() => this.navigation.push('Theme')} title="Theme" />
-          <HamburgerMenuButton onClick={() => this.navigation.push('Language')} title="Language" />
-          <HamburgerMenuButton onClick={() => this.navigation.push('Change')} title="Change Log" />
-      </Hamburger>
     );
   }
 }
@@ -244,7 +177,7 @@ const styles = StyleSheet.create({
     color: '#C4C4C4',
 
     margin: 45,
-    backgroundColor: "#626262"
+    backgroundColor: "#626262",
   },
 
   participantlist: {
@@ -256,13 +189,24 @@ const styles = StyleSheet.create({
 
     paddingTop: 8,
 
+
     flexGrow: 0,
     alignSelf: 'center',
-    borderRadius: 10
+    borderRadius: 10,
   },
   
   participant: {
-    fontSize: 23,
+    height: 30,
+
+    flexDirection: 'row',
+
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+
+  participantText: {
+    lineHeight: 30,
+    fontSize: 25,
     color: "#C4C4C4",
     paddingLeft: 10,
   },
@@ -273,6 +217,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#C4C4C4",
     marginTop: 8,
     marginBottom: 8,
+    
   },
 
   code: {

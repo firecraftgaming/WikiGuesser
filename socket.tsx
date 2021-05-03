@@ -1,4 +1,4 @@
-import { get, set, has } from './location';
+import { get, set, has, remove } from './location';
 import { io, Socket } from 'socket.io-client';
 
 if (!has('socket')) {
@@ -7,14 +7,33 @@ if (!has('socket')) {
 }
 
 let socket = get('socket') as Socket;
+interface Request {
+    success: Function;
+    error: Function;
+}
 
-// TODO: Meant to be a request system: client sends message that ends with reqid and then server respond with msg that ends with reqid then client method returns
+let requests = new Map<number, Request>()
 let reqid = 0;
-function request(...args: any[]) {
-    reqid++;
-    return new Promise((res, rej) => {
+function request(action: string, ...args: any[]) { 
+    return new Promise((res: (response: any) => any, rej: (error: any) => any) => {
+        let req = reqid++;
 
+        requests.set(req, {
+            success: res,
+            error: rej
+        });
+        socket.emit(action, req, ...args);
     });
 }
 
-export { socket }
+socket.on('success', (req, response) => {
+    requests.get(req)?.success(response);
+    requests.delete(req);
+});
+socket.on('error', (req, response) => {
+    requests.get(req)?.error(response);
+    requests.delete(req);
+});
+socket.on('disconnect', _ => remove('socket'))
+
+export { socket, request }

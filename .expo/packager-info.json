@@ -1,10 +1,10 @@
 {
   "devToolsPort": 19002,
-  "expoServerPort": 19000,
+  "expoServerPort": null,
   "packagerPort": 19000,
   "expoServerNgrokUrl": "https://tr-cq5.anonymous.wikiguesser.exp.direct",
   "packagerNgrokUrl": "https://packager.tr-cq5.anonymous.wikiguesser.exp.direct",
-  "ngrokPid": 7752,
+  "ngrokPid": 6132,
   "packagerPid": null,
   "webpackServerPort": null
 }
