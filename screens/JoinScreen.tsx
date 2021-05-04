@@ -61,7 +61,7 @@ export default class JoinScreen extends Component<ScreenProps, {valid: boolean, 
           <View style={styles.bottomView}>
             <FormSubmit active={this.state.valid} onClick={() => {
               request('join', get('username'), get('code')).then(v => {
-                this.props.navigation.push('ParticipantLobby');
+                this.props.navigation.push('Lobby');
               }).catch(e => {
                 console.log(e);
                 this.setState({

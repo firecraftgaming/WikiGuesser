@@ -14,6 +14,7 @@ import { get, set } from '../location';
 import { LocalMultiplayerView, Participant, Separator } from '../components/Participant';
 import Settings from '../components/Settings';
 import { Component } from 'react';
+import { request } from '../socket';
 
 
 const DATA: string[] = [];
@@ -107,7 +108,12 @@ export default class CreateScreen extends Component<ScreenProps, {multiplayer: s
           </View>
 
           <View style={styles.bottomView}>
-            <FormSubmit active={this.state.valid} onClick={() => this.props.navigation.push('HostLobby')}></FormSubmit>
+            <FormSubmit active={this.state.valid} onClick={() => {
+              request('create', get('username')).then(v => {
+                set('code', v.code);
+                this.props.navigation.push('Lobby')
+              }).catch(e => console.error(e));
+            }}/>
           </View>
       </View>
     );
