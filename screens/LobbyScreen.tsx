@@ -3,8 +3,8 @@ import { StyleSheet, View, Text, Alert, BackHandler, NativeEventSubscription } f
 import Back from '../components/Back';
 import Colors from '../constants/Colors';
 
-import { ScreenProps } from '../types';
-import { FormObject, FormSubmit } from '../components/Form';
+import {ScreenProps } from '../types';
+import {FormObject, FormSubmit } from '../components/Form';
 import { get } from '../location';
 import { socket, request } from '../socket';
 import { Player, PlayerList } from '../components/Participant';
@@ -32,6 +32,14 @@ export default class HostLobbyScreen extends Component<ScreenProps, {code: strin
             });
         });
 
+        socket.on('kick', () => {
+            this.props.navigation.pop();
+            Alert.alert(
+                "Kicked",
+                "The Game Host Kicked You"
+            )
+        });
+
         this.backHandler = BackHandler.addEventListener(
             'hardwareBackPress',
             this.showAlert.bind(this)
@@ -57,12 +65,12 @@ export default class HostLobbyScreen extends Component<ScreenProps, {code: strin
               } 
             }
           ]
-        )
+        );
         return true;
       }
 
     kick(index: number) {
-      //TODO: Send id to server for kick
+      request('kick', this.players[index].id);
     }
     
     render()  {
