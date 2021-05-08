@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Component } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Button, StyleSheet, View } from 'react-native';
 import Back from '../components/Back';
 import Colors from '../constants/Colors';
 
@@ -15,6 +15,7 @@ export default class SettingsScreen extends Component<ScreenProps> {
     return (
       <View style={styles.container}>
           <Back onClick={() => this.props.navigation.pop()}/>
+          <Button title="Game" onPress={() => this.props.navigation.push('Game')}/>
       </View>
     );
   }

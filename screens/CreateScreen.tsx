@@ -27,6 +27,7 @@ export default class CreateScreen extends Component<ScreenProps, {multiplayer: s
 
   constructor(props: ScreenProps) {
     super(props);
+    set('username', '');
     this.state = {
       valid: false,
       multiplayer: null
@@ -36,7 +37,7 @@ export default class CreateScreen extends Component<ScreenProps, {multiplayer: s
   onChange() {
     let valid = true;
 
-    switch (this.state.multiplayer) {
+    switch (radio_group.value) {
       case 'local':
         if (DATA.length < 2) valid = false;
         break;
@@ -109,10 +110,14 @@ export default class CreateScreen extends Component<ScreenProps, {multiplayer: s
 
           <View style={styles.bottomView}>
             <FormSubmit active={this.state.valid} onClick={() => {
-              request('create', get('username')).then(v => {
-                set('code', v.code);
-                this.props.navigation.push('Lobby')
-              }).catch(e => console.error(e));
+              if (this.state.multiplayer == 'online') {
+                request('create', get('username')).then(v => {
+                  set('code', v.code);
+                  this.props.navigation.push('Lobby')
+                }).catch(e => console.error(e));
+              } else {
+                null
+              }
             }}/>
           </View>
       </View>

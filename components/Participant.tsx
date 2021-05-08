@@ -1,17 +1,24 @@
 import React, { Component } from "react";
 import { FlatList, View, Text, StyleSheet, TextInput, Keyboard } from "react-native";
-import Colors from "../constants/Colors";
 import { FormObject } from "./Form";
+import Crown from "./Crown";
 import Minus from "./Minus";
 import Plus from "./Plus";
 
 interface Player {
     name: string;
     id: number;
-  }
+}
 
-class Participant extends React.Component<{name: string, removable?: boolean, removeCallback?: Function}, {}> {
-    constructor(props: {name: string}) {
+interface ParticipantProps {
+    name: string;
+    removable?: boolean;
+    remove?: Function;
+    extra: any;
+}
+
+class Participant extends React.Component<ParticipantProps, {}> {
+    constructor(props: ParticipantProps) {
       super(props);
     }
   
@@ -20,8 +27,11 @@ class Participant extends React.Component<{name: string, removable?: boolean, re
             <View style={styles.participant}>
                 <Text style={styles.participantText}>{this.props.name}</Text>
                 {
+                    this.props.extra?.host ? (
+                        <Crown/>
+                    ) :
                     this.props.removable ? (
-                        <Minus onClick={() => this.props.removeCallback ? this.props.removeCallback() : null}/>
+                        <Minus onClick={() => this.props.remove ? this.props.remove() : null}/>
                     ) : null
                 }
             </View>
@@ -41,10 +51,18 @@ class Separator extends React.Component<{}, {}> {
     }
 }
 
-class PlayerList<T> extends React.Component<{ DATA: T[], removable?: boolean, removeCallback?: Function, nameExtractor?: (item: T, index: number) => string }, {}> {
+interface PlayerListProps<T> {
+    DATA: T[];
+    removable?: boolean | ((item: T, index: number) => boolean);
+    removeCallback?: (index: number) => any;
+    nameExtractor?: (item: T, index: number) => string;
+    extraExtractor?: (item: T, index: number) => any;
+}
+
+class PlayerList<T> extends React.Component<PlayerListProps<T>, {}> {
     private list: FlatList | null = null;
 
-    constructor(props: { DATA: T[], removable?: boolean, removeCallback?: Function, nameExtractor?: (item: T, index: number) => string }) {
+    constructor(props: PlayerListProps<T>) {
         super(props);
     }
 
@@ -53,13 +71,19 @@ class PlayerList<T> extends React.Component<{ DATA: T[], removable?: boolean, re
     }
   
     render() {
-        let extractor = this.props.nameExtractor ?? (v => String(v));
         return (
             <FlatList
                 contentInset={{ bottom: 16 }}
                 ref={v => this.list = v}
                 data={this.props.DATA}
-                renderItem={({item, index}) => <Participant name={extractor(item, index)} removable={this.props.removable} removeCallback={() => this.props.removeCallback ? this.props.removeCallback(index) : null}/>}
+                renderItem={({item, index}) => (
+                    <Participant
+                        name={this.props.nameExtractor ? this.props.nameExtractor(item, index) : String(item)}
+                        extra={this.props.extraExtractor ? this.props.extraExtractor(item, index) : null}
+                        remove={() => (this.props.removeCallback ? this.props.removeCallback(index) : null)}
+                        removable={this.props.removable === undefined ? false : (typeof this.props.removable === 'boolean') ? this.props.removable : this.props.removable(item, index)}
+                    />
+                )}
                 keyExtractor={(_, index) => index.toString()}
                 style={styles.participantlist}
                 ItemSeparatorComponent={Separator}
@@ -167,6 +191,11 @@ const styles = StyleSheet.create({
         marginTop: 8,
         marginBottom: 8,
         
+    },
+
+    crown: {
+        alignSelf: 'center',
+        marginRight: 25,
     }
 });
   

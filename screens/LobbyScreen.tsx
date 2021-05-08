@@ -11,13 +11,13 @@ import { Player, PlayerList } from '../components/Participant';
 import { Component } from 'react';
 import Settings from '../components/Settings';
 
-export default class HostLobbyScreen extends Component<ScreenProps, {code: string, isHost: boolean}> {
+export default class HostLobbyScreen extends Component<ScreenProps, {code: string, host: number}> {
     public players: Player[] = [];
     private backHandler: NativeEventSubscription | undefined;
 
     constructor(props: ScreenProps) {
         super(props);
-        this.state = {code: '', isHost: false};
+        this.state = {code: '', host: -1};
 
         socket.emit('request-update');
 
@@ -28,7 +28,7 @@ export default class HostLobbyScreen extends Component<ScreenProps, {code: strin
 
         socket.on('host-change', id => {
             this.setState({
-                isHost: id < 0,
+                host: id,
             });
         });
 
@@ -84,14 +84,18 @@ export default class HostLobbyScreen extends Component<ScreenProps, {code: strin
                     <Text style={styles.header}>{get('code')}</Text>
                     <PlayerList
                       DATA={this.players}
-                      removable={this.state.isHost}
+                      removable={item => (this.state.host < 0 && item.id >= 0)}
                       removeCallback={this.kick.bind(this)}
                       nameExtractor={item => item.name}
+                      extraExtractor={item => ({
+                        self: item.id < 0,
+                        host: this.state.host == item.id
+                      })}
                     />
                 </View>
                 
                 <View style={styles.bottomView}>
-                    {this.state.isHost ? <FormSubmit active={true} onClick={() => null}></FormSubmit> : null}
+                    {this.state.host < 0 ? <FormSubmit active={true} onClick={() => null}></FormSubmit> : null}
                 </View>
             </View>
         );
@@ -113,6 +117,7 @@ const styles = StyleSheet.create({
         marginTop: 20,
         height: 50,
         width: '100%',
+        zIndex: -10,
     },
     centerView: {
         marginBottom: 70,
