@@ -27,7 +27,7 @@ export default function App() {
   const [loaded] = useFonts({
     Robban: require('./assets/fonts/Roboto-Regular.ttf'),
   });
-  
+
   if (!loaded) {
     return null;
   }

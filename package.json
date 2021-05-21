@@ -38,7 +38,9 @@
     "react-native-svg": "^12.1.1",
     "react-native-web": "~0.13.12",
     "react-native-webview": "^11.4.4",
-    "socket.io-client": "^4.0.1"
+    "socket.io-client": "^4.0.1",
+    "tailwind-react-native-classnames": "^1.2.0",
+    "tailwindcss": "^2.1.2"
   },
   "devDependencies": {
     "@babel/core": "^7.9.0",

@@ -92,52 +92,6 @@ class PlayerList<T> extends React.Component<PlayerListProps<T>, {}> {
     }
 }
 
-class LocalMultiplayerView extends Component<{ DATA: string[], onChange: Function }, { participantName: string }> {
-    private list = React.createRef<PlayerList<string>>();
-
-    constructor(props: { DATA: string[], onChange: Function }) {
-        super(props);
-        this.state = {
-            participantName: ''
-        }
-    }
-    add(name: string) {
-        if (name.trim().length < 1) return;
-
-        this.props.DATA.push(name);
-        requestAnimationFrame(() => this.list.current?.scrollToEnd());
-        if (this.props.onChange) this.props.onChange();
-    }
-    remove(index: number) {
-        this.props.DATA.splice(index, 1);
-        this.list.current?.forceUpdate();
-        if (this.props.onChange) this.props.onChange();
-    }
-    clear() {
-        Keyboard.dismiss();
-        this.setState({participantName: ''});
-    }
-    render() {
-        return (
-            <View>
-                <FormObject>
-                    <TextInput value={this.state.participantName} placeholder="Participant" placeholderTextColor="#C4C4C4" style={styles.participantinput} onChangeText={v => this.setState({participantName: v})}/>
-                    <Plus onClick={() => {
-                        this.add(this.state.participantName);
-                        this.clear();
-                    }}/>
-                </FormObject>
-                <PlayerList
-                    ref={this.list}
-                    DATA={this.props.DATA}
-                    removable={true}
-                    removeCallback={this.remove.bind(this)}
-                />
-            </View>
-        );
-    }
-}
-
 const styles = StyleSheet.create({
     participantinput: {
         borderRadius: 8,
@@ -200,4 +154,4 @@ const styles = StyleSheet.create({
 });
   
 
-export { Participant, Separator, PlayerList, LocalMultiplayerView, Player };
+export { Participant, Separator, PlayerList, Player };

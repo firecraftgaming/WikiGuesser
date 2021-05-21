@@ -1,20 +1,17 @@
 import * as React from 'react';
-import { StyleSheet, View, FlatList, Text, Keyboard, TextInputComponent } from 'react-native';
-import { TextInput } from 'react-native-gesture-handler';
-import Back from '../components/Back';
-import Plus from '../components/Plus';
-import Minus from '../components/Minus';
-import { FormObject, FormSwitch, FormRadio, RadioGroup, FormSubmit } from '../components/Form';
+import { StyleSheet, View, FlatList, Text } from 'react-native';
+import tw from 'tailwind-react-native-classnames';
+import { FormObject, FormRadio, RadioGroup, FormSubmit } from '../components/Form';
 import Colors from '../constants/Colors';
 
-import fetch from 'node-fetch';
 import { ScreenProps } from '../types';
 
 import { get, set } from '../location';
-import { LocalMultiplayerView, Participant, Separator } from '../components/Participant';
-import Settings from '../components/Settings';
 import { Component } from 'react';
 import { request } from '../socket';
+import { MainLayout } from '../components/MainLayout';
+import { OnlineMultiplayerView } from '../components/OnlineMultiplayerView';
+import { LocalMultiplayerView } from '../components/LocalMultiplayerView';
 
 
 const DATA: string[] = [];
@@ -73,54 +70,37 @@ export default class CreateScreen extends Component<ScreenProps, {multiplayer: s
 
   render() {
     return (
-      <View style={styles.container}>
-          <Back onClick={() => this.props.navigation.pop()}/>
-          <Settings onClick={() => this.props.navigation.push('Settings')}/>
-
-          <View style={styles.topView}>
-            {
-              <Text style={styles.title}>Create</Text>
-              /*
-                <FormObject title="Slow Mode" style={styles.bottomView}>
-                  <FormSwitch></FormSwitch>
-                </FormObject>
-              */
-            }
+      <MainLayout back={true} settings={true} 
+      bottom={
+        <FormSubmit active={this.state.valid} onClick={() => {
+          if (this.state.multiplayer == 'online') {
+            request('create', get('username')).then(v => {
+              set('code', v.code);
+              this.props.navigation.push('Lobby')
+            }).catch(e => console.error(e));
+          } else {
+            null
+          }
+        }}/>
+      }
+      >
+        <View style={tw`w-full h-full flex flex-col justify-start items-center`}>
+          <View style={tw`mb-4`}>
+            <Text style={styles.title}>Create</Text>
             <FormObject title="Local Multiplayer">
               <FormRadio group={radio_group} value="local"></FormRadio>
             </FormObject>
-            <FormObject title="Online Multiplayer" style={styles.bottomView}>
+            <FormObject title="Online Multiplayer">
               <FormRadio group={radio_group} value="online"></FormRadio>
             </FormObject>
-
-
-
-            {
-              this.state.multiplayer == 'local' ? <LocalMultiplayerView DATA={DATA} onChange={() => this.onChange()}/> : 
-              this.state.multiplayer == 'online' ? (
-                <FormObject key="userInput">
-                  <TextInput placeholder="Username" onChangeText={v => {
-                    set('username', v);
-                    this.onChange();
-                  }} placeholderTextColor="#C4C4C4" style={styles.usernameinput}/>
-                </FormObject>
-              ) : null
-            }
           </View>
-
-          <View style={styles.bottomView}>
-            <FormSubmit active={this.state.valid} onClick={() => {
-              if (this.state.multiplayer == 'online') {
-                request('create', get('username')).then(v => {
-                  set('code', v.code);
-                  this.props.navigation.push('Lobby')
-                }).catch(e => console.error(e));
-              } else {
-                null
-              }
-            }}/>
-          </View>
-      </View>
+          {
+            this.state.multiplayer == 'local' ? <LocalMultiplayerView DATA={DATA} onChange={() => this.onChange()}/> : 
+            this.state.multiplayer == 'online' ? <OnlineMultiplayerView/>
+            : null
+          }
+        </View>
+      </MainLayout>
     );
   }
 }

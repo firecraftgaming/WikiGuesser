@@ -1,11 +1,8 @@
 import * as React from 'react';
 import { Component } from 'react';
-import { StyleSheet, View, Text } from 'react-native';
-import Back from '../components/Back';
-import Settings from '../components/Settings';
-import Colors from '../constants/Colors';
-
-import { WebView } from 'react-native-webview';
+import { View } from 'react-native';
+import { MainLayout } from '../components/MainLayout';
+import tw from 'tailwind-react-native-classnames';
 
 import { ScreenProps } from '../types';
 
@@ -16,26 +13,18 @@ export default class Screen extends Component<ScreenProps> {
 
   render()  {
     return (
-        /*
-      <View style={styles.container}>
-            <Back onClick={() => this.props.navigation.pop()}/>
-            <Settings onClick={() => this.props.navigation.push('Settings')}/>
-            <Text>Test</Text>
-      </View>
-      */
-      <WebView 
-      source={{uri: 'https://sv.wikipedia.org/wiki/Coca-Cola'}}
-      style={{width: '100%', height: '100%'}}
-      />
+      <MainLayout 
+      back={true} 
+      settings={true} 
+      top={
+        <View style={[tw`w-full h-full`, {backgroundColor: '#ff0000'}]}></View>
+      }
+      bottom={
+        <View style={[tw`w-full h-full`, {backgroundColor: '#00ff00'}]}></View>
+      }
+      >
+        <View style={[tw`w-full h-full`, {backgroundColor: '#0000ff'}]}></View>
+      </MainLayout>
     );
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: Colors.dark.background
-  }
-});
